@@ -1,16 +1,24 @@
 # marvel
 
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+lib/
+├── consts/              # Sabitler ve yardımcı bileşenler
+│   ├── layout_helper.dart
+│   └── no_internet_dialog.dart
+├── controllers/         # GetX controller dosyaları
+│   ├── favourite_controller.dart
+│   ├── main_controller.dart
+│   └── profile_controller.dart
+├── modules/             # Veri modelleri
+│   └── character.dart
+├── pages/               # Ekran dosyaları (UI)
+│   ├── favourite_page.dart
+│   ├── main_page.dart
+│   ├── profile_page.dart
+│   └── splash_page.dart
+├── routes/              # Sayfa yönlendirme yapısı
+│   ├── pages.dart
+│   └── routes.dart
+├── services/            # API ve yerel verilerle ilgili servisler
+│   ├── favourite_service.dart
+│   └── my_api.dart
+└── main.dart            # Uygulama başlangıç noktası
