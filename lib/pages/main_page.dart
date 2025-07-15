@@ -155,6 +155,7 @@ class MainPage extends GetView<MainController> {
                       hintText: controller.animatedHintText.value,
                       hintStyle: TextStyle(
                         color: Colors.white.withOpacity(0.6),
+                        fontSize: screenWidth * 0.025,
                       ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(

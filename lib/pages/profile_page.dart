@@ -8,6 +8,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:loading_animation_widget/loading_animation_widget.dart';
 import 'package:marvel/consts/layout_helper.dart';
 import 'package:marvel/controllers/profile_controller.dart';
+import 'package:marvel/services/favourite_service.dart';
 
 class ProfilePage extends GetView<ProfileController> {
   const ProfilePage({super.key});
@@ -38,14 +39,107 @@ class ProfilePage extends GetView<ProfileController> {
             ),
             child: Column(
               children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                    onPressed: () {
-                      Get.back();
-                    },
+                Padding(
+                  padding: EdgeInsets.only(bottom: screenHeight * 0.01),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Align(
+                        alignment: Alignment.topLeft,
+                        child: IconButton(
+                          onPressed: () {
+                            Get.back();
+                          },
 
-                    icon: Icon(Icons.arrow_back, size: 30, color: Colors.white),
+                          icon: Icon(
+                            Icons.arrow_back,
+                            size: 30,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                      Obx(
+                        () => Padding(
+                          padding: EdgeInsets.only(right: screenWidth * 0.05),
+                          child: GestureDetector(
+                            onTap: () async {
+                              if (!controller.character.isFavorite.value) {
+                                controller.character.isFavorite.value = true;
+                                await FavoriteStorage.addFavorite(
+                                  controller.character.id,
+                                );
+                              } else {
+                                controller.character.isFavorite.value = false;
+                                await FavoriteStorage.removeFavorite(
+                                  controller.character.id,
+                                );
+                              }
+                            },
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 300),
+                              switchInCurve: Curves.easeOutBack,
+                              switchOutCurve: Curves.easeInBack,
+                              transitionBuilder: (child, anim) =>
+                                  RotationTransition(
+                                    turns: Tween<double>(
+                                      begin: 0.75,
+                                      end: 1,
+                                    ).animate(anim),
+                                    child: FadeTransition(
+                                      opacity: anim,
+                                      child: ScaleTransition(
+                                        scale: anim,
+                                        child: child,
+                                      ),
+                                    ),
+                                  ),
+                              child: Container(
+                                width: screenWidth * 0.12,
+                                height: screenWidth * 0.12,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Center(
+                                  child: AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 300),
+                                    switchInCurve: Curves.easeOutBack,
+                                    switchOutCurve: Curves.easeInBack,
+                                    transitionBuilder: (child, anim) =>
+                                        RotationTransition(
+                                          turns: Tween<double>(
+                                            begin: 0.75,
+                                            end: 1,
+                                          ).animate(anim),
+                                          child: FadeTransition(
+                                            opacity: anim,
+                                            child: ScaleTransition(
+                                              scale: anim,
+                                              child: child,
+                                            ),
+                                          ),
+                                        ),
+                                    child: Icon(
+                                      controller.character.isFavorite.value
+                                          ? Icons.favorite
+                                          : Icons.favorite_border,
+                                      key: ValueKey(
+                                        controller.character.isFavorite.value,
+                                      ), // 🔵
+                                      color: Colors.red,
+                                      size: screenWidth * 0.08,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
 
