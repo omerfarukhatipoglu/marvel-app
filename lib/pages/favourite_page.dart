@@ -87,7 +87,7 @@ class FavouritePage extends GetView<FavouriteController> {
                         child: AutoSizeText(
                           'Karakter bulunamadı.',
                           maxLines: 1,
-                          style: GoogleFonts.orbitron(
+                          style: GoogleFonts.aBeeZee(
                             color: Colors.white,
                             fontSize: screenWidth * 0.05,
                           ),

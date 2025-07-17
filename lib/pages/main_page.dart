@@ -17,6 +17,7 @@ class MainPage extends GetView<MainController> {
 
   @override
   Widget build(BuildContext context) {
+    final isTablet = LayoutHelper(context).isTablet;
     final screenHeight = LayoutHelper(context).screenHeight;
     final screenWidth = LayoutHelper(context).screenWidth;
 
@@ -155,7 +156,9 @@ class MainPage extends GetView<MainController> {
                       hintText: controller.animatedHintText.value,
                       hintStyle: TextStyle(
                         color: Colors.white.withOpacity(0.6),
-                        fontSize: screenWidth * 0.025,
+                        fontSize: isTablet
+                            ? screenWidth * 0.025
+                            : screenWidth * 0.035,
                       ),
                       border: InputBorder.none,
                       contentPadding: EdgeInsets.symmetric(
@@ -197,7 +200,7 @@ class MainPage extends GetView<MainController> {
                       child: AutoSizeText(
                         'Karakter bulunamadı.',
                         maxLines: 1,
-                        style: GoogleFonts.orbitron(
+                        style: GoogleFonts.aBeeZee(
                           color: Colors.white,
                           fontSize: screenWidth * 0.05,
                         ),

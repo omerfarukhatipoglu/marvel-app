@@ -22,7 +22,7 @@ class ProfilePage extends GetView<ProfileController> {
     final qualifier = parts[1];
     return Scaffold(
       body: SingleChildScrollView(
-        physics: PageScrollPhysics(),
+        physics: ClampingScrollPhysics(),
         child: Container(
           width: double.infinity,
           constraints: BoxConstraints(minHeight: screenHeight),
@@ -173,6 +173,24 @@ class ProfilePage extends GetView<ProfileController> {
                   screenHeight,
                   controller.character.seriesTitles,
                   "Seriler",
+                ),
+                listContainer(
+                  screenWidth,
+                  screenHeight,
+                  controller.character.comicNames,
+                  "Çizgi Romanlar",
+                ),
+                listContainer(
+                  screenWidth,
+                  screenHeight,
+                  controller.character.eventNames,
+                  "Etkinlikler",
+                ),
+                listContainer(
+                  screenWidth,
+                  screenHeight,
+                  controller.character.storyNames,
+                  "Hikayeler",
                 ),
               ],
             ),

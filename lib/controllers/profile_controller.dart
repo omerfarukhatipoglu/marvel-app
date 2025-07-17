@@ -20,7 +20,6 @@ class ProfileController extends GetxController {
     } else {
       translatedText.value = '--';
       isTranslating.value = false;
-      ;
     }
   }
 
