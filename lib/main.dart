@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:marvel/controllers/favourite_controller.dart';
 import 'package:marvel/controllers/main_controller.dart';
 import 'package:marvel/routes/pages.dart';
 import 'package:marvel/routes/routes.dart';
+import 'package:marvel/services/favourite_service.dart';
 
 void main() async {
-  var mainController = Get.put(MainController());
-  await mainController.loadPrefs();
-  await mainController.loadCharacters();
   WidgetsFlutterBinding.ensureInitialized();
+  await FavoriteStorage.getFavoriteIds(); // bu otomatik olarak DB'yi init eder
 
+  Get.put(MainController());
+  await Get.find<MainController>().loadPrefs();
+  await Get.find<MainController>().loadCharacters();
+
+  Get.put(FavouriteController()); // ❗ Sadece burada put et, başka yerde değil!
   runApp(const MyApp());
 }
 

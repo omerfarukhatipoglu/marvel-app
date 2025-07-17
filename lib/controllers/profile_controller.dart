@@ -6,6 +6,7 @@ class ProfileController extends GetxController {
   late Character character;
   final translatedText = ''.obs;
   final isTranslating = true.obs;
+  final isFromSQLite = false.obs;
 
   final _translator = GoogleTranslator();
 
@@ -14,7 +15,10 @@ class ProfileController extends GetxController {
     super.onInit();
     character = Get.arguments;
 
-    final desc = character.description?.toString().trim() ?? '';
+    // 🔍 Kaynağı belirle: imageUrl boşsa SQLite'tan gelmiştir
+    isFromSQLite.value = character.imageUrl.isEmpty;
+
+    final desc = character.description.trim();
     if (desc.isNotEmpty) {
       _translateDescription(desc);
     } else {
@@ -25,7 +29,7 @@ class ProfileController extends GetxController {
 
   Future<void> _translateDescription(String description) async {
     try {
-      isTranslating.value = true; // 🔹 Başladı
+      isTranslating.value = true;
 
       final translation = await _translator.translate(
         description,
@@ -38,10 +42,10 @@ class ProfileController extends GetxController {
           .replaceAll('Ğ', 'G');
 
       translatedText.value = sanitized;
-    } catch (e) {
+    } catch (_) {
       translatedText.value = character.description;
     } finally {
-      isTranslating.value = false; // 🔹 Bitti
+      isTranslating.value = false;
     }
   }
 

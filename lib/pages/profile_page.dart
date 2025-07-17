@@ -1,5 +1,7 @@
 // ignore_for_file: deprecated_member_use
 
+import 'dart:convert';
+
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
@@ -48,7 +50,7 @@ class ProfilePage extends GetView<ProfileController> {
                         alignment: Alignment.topLeft,
                         child: IconButton(
                           onPressed: () {
-                            Get.back();
+                            Get.back(result: true);
                           },
 
                           icon: Icon(
@@ -65,8 +67,15 @@ class ProfilePage extends GetView<ProfileController> {
                             onTap: () async {
                               if (!controller.character.isFavorite.value) {
                                 controller.character.isFavorite.value = true;
+
+                                // ✅ RESMİ BASE64’E DÖNÜŞTÜRÜYORUZ
+                                final updatedCharacter =
+                                    await FavoriteStorage.convertCharacterWithBase64(
+                                      controller.character,
+                                    );
+
                                 await FavoriteStorage.addFavorite(
-                                  controller.character.id,
+                                  updatedCharacter,
                                 );
                               } else {
                                 controller.character.isFavorite.value = false;
@@ -75,6 +84,7 @@ class ProfilePage extends GetView<ProfileController> {
                                 );
                               }
                             },
+
                             child: AnimatedSwitcher(
                               duration: const Duration(milliseconds: 300),
                               switchInCurve: Curves.easeOutBack,
@@ -145,12 +155,26 @@ class ProfilePage extends GetView<ProfileController> {
 
                 ClipRRect(
                   borderRadius: BorderRadius.circular(18),
-                  child: CachedNetworkImage(
-                    imageUrl: controller.character.imageUrl,
-                    width: screenWidth * 0.75,
-                    height: screenWidth * 0.75,
-                    fit: BoxFit.fill,
-                  ),
+                  child: Obx(() {
+                    if (controller.isFromSQLite.value) {
+                      // SQLite → base64 görsel
+                      return Image.memory(
+                        base64Decode(controller.character.base64Image ?? ''),
+                        width: screenWidth * 0.75,
+                        height: screenWidth * 0.75,
+                        fit: BoxFit.fill,
+                        errorBuilder: (_, __, ___) => const Icon(Icons.image),
+                      );
+                    } else {
+                      // API → normal URL
+                      return CachedNetworkImage(
+                        imageUrl: controller.character.imageUrl,
+                        width: screenWidth * 0.75,
+                        height: screenWidth * 0.75,
+                        fit: BoxFit.fill,
+                      );
+                    }
+                  }),
                 ),
                 textContainer(screenWidth, screenHeight, mainName, "İsim"),
 

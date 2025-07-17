@@ -180,7 +180,6 @@ class MainPage extends GetView<MainController> {
                 ),
               ),
             ),
-
             Expanded(
               child: Obx(() {
                 if (controller.isLoading.value) {
@@ -191,15 +190,36 @@ class MainPage extends GetView<MainController> {
                     ),
                   );
                 }
+
                 if (controller.characters.isEmpty) {
+                  final bool isSearchActive = controller.searchText.text
+                      .trim()
+                      .isNotEmpty;
+
+                  if (controller.hasConnectionError.value) {
+                    // 🔁 Bağlantı hatası varsa yükleniyor efekti göster
+                    return Center(
+                      child: LoadingAnimationWidget.hexagonDots(
+                        color: Colors.white,
+                        size: 40,
+                      ),
+                    );
+                  }
+
+                  // 🎯 Diğer durumlar için uygun mesaj
+                  String message = isSearchActive
+                      ? "Aradığınız karakter bulunamadı."
+                      : "Hiç karakter yüklenemedi.";
+
                   return Center(
                     child: Padding(
                       padding: EdgeInsets.symmetric(
                         horizontal: screenWidth * 0.2,
                       ),
                       child: AutoSizeText(
-                        'Karakter bulunamadı.',
-                        maxLines: 1,
+                        message,
+                        maxLines: 2,
+                        textAlign: TextAlign.center,
                         style: GoogleFonts.aBeeZee(
                           color: Colors.white,
                           fontSize: screenWidth * 0.05,
@@ -208,7 +228,6 @@ class MainPage extends GetView<MainController> {
                     ),
                   );
                 }
-
                 return Stack(
                   children: [
                     RefreshIndicator(
@@ -269,8 +288,13 @@ class MainPage extends GetView<MainController> {
                                           onTap: () async {
                                             if (!ch.isFavorite.value) {
                                               ch.isFavorite.value = true;
+
+                                              final updatedCharacter =
+                                                  await FavoriteStorage.convertCharacterWithBase64(
+                                                    ch,
+                                                  );
                                               await FavoriteStorage.addFavorite(
-                                                ch.id,
+                                                updatedCharacter,
                                               );
                                             } else {
                                               ch.isFavorite.value = false;
@@ -279,6 +303,7 @@ class MainPage extends GetView<MainController> {
                                               );
                                             }
                                           },
+
                                           child: AnimatedSwitcher(
                                             duration: const Duration(
                                               milliseconds: 300,
@@ -303,6 +328,7 @@ class MainPage extends GetView<MainController> {
                                               ch.isFavorite.value
                                                   ? Icons.favorite
                                                   : Icons.favorite_border,
+                                              size: 30,
                                               key: ValueKey(
                                                 ch.isFavorite.value,
                                               ),
@@ -417,8 +443,13 @@ class MainPage extends GetView<MainController> {
                                                           .value) {
                                                         ch.isFavorite.value =
                                                             true;
+
+                                                        final updatedCharacter =
+                                                            await FavoriteStorage.convertCharacterWithBase64(
+                                                              ch,
+                                                            );
                                                         await FavoriteStorage.addFavorite(
-                                                          ch.id,
+                                                          updatedCharacter,
                                                         );
                                                       } else {
                                                         ch.isFavorite.value =
@@ -428,6 +459,7 @@ class MainPage extends GetView<MainController> {
                                                         );
                                                       }
                                                     },
+
                                                     child: Container(
                                                       width: 30,
                                                       height: 30,

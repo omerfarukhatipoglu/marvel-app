@@ -11,6 +11,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 class MainController extends GetxController {
   final MyApi api = MyApi();
   TextEditingController searchText = TextEditingController();
+  Timer? _retryTimer;
+  bool _hasActiveRetry = false;
+  var hasConnectionError = false.obs;
 
   static const _sortKey = 'sortIndex';
   static const _viewKey = 'viewMode';
@@ -114,9 +117,17 @@ class MainController extends GetxController {
         orderBy: currentOrderBy,
       );
 
+      // ✅ Başarılı sonuç geldiyse retry'ı durdur
+      _stopRetry();
+
       if (currentRequestId != _requestId) return;
 
-      if (result.isEmpty || result.length < pageSize) isLastPage.value = true;
+      // 🧠 Bağlantı var, ama veri boşsa yine de bağlantı hatası değil
+      hasConnectionError.value = false;
+
+      if (result.length < pageSize) {
+        isLastPage.value = true;
+      }
 
       final updatedResult = result.map((ch) {
         ch.isFavorite.value = favoriteIds.contains(ch.id);
@@ -126,13 +137,33 @@ class MainController extends GetxController {
       characters.addAll(updatedResult);
       _offset += updatedResult.length;
     } catch (e) {
-      if (currentRequestId == _requestId) {}
+      // ❌ API başarısız → bağlantı problemi var
+      hasConnectionError.value = true;
+
+      _startRetry(() {
+        return loadCharacters(nameStartsWith: nameStartsWith, reset: reset);
+      });
     } finally {
       if (currentRequestId == _requestId) {
         isLoading.value = false;
         isLoadingMore.value = false;
       }
     }
+  }
+
+  void _startRetry(Future<void> Function() retryFunction) {
+    if (_hasActiveRetry) return;
+
+    _hasActiveRetry = true;
+    _retryTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      retryFunction();
+    });
+  }
+
+  void _stopRetry() {
+    _retryTimer?.cancel();
+    _retryTimer = null;
+    _hasActiveRetry = false;
   }
 
   Future<void> refreshCharacters({String? nameStartsWith}) {
